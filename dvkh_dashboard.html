@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phòng Dịch vụ khách hàng · HV Holdings</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;450;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#fafaf7;--surface:#ffffff;--line:#e8e5dc;--line-2:#d4cfc0;
+  --ink:#1a1a1a;--ink-2:#3d3d3d;--ink-3:#737373;--ink-4:#a8a39a;
+  --good:#2d6a4f;--good-bg:#e8f3ee;--good-strong:#1f4d36;
+  --bad:#9a2a2a;--bad-bg:#f8ebeb;--bad-strong:#6e1d1d;
+  --warn:#8a5a0a;--warn-bg:#f5ecd8;--warn-strong:#634208;
+  --info:#1f4e8c;--info-bg:#e7eef8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;font-feature-settings:'cv11','ss01','ss03'}
+.container{max-width:1280px;margin:0 auto;padding:32px 32px 80px}
+
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.head-l h1{font-size:22px;font-weight:500;letter-spacing:-0.02em;margin-bottom:4px}
+.head-l .sub{font-size:13px;color:var(--ink-3)}
+.head-r{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3);text-align:right;line-height:1.7}
+.head-r .k{color:var(--ink-4)}
+
+.cfg{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end}
+.cfg label{display:block;font-size:10px;font-weight:500;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px}
+.cfg input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;outline:none}
+.cfg input:focus{border-color:var(--ink-3)}
+.cfg .acts{display:flex;gap:6px}
+.btn{font-family:'Inter',sans-serif;font-weight:500;font-size:12px;padding:8px 14px;border:1px solid var(--ink);border-radius:6px;background:var(--ink);color:#fff;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.btn:hover{background:var(--ink-2)}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn.ghost:hover{background:var(--bg);border-color:var(--ink-3)}
+
+.status{font-family:'JetBrains Mono',monospace;font-size:11px;padding:10px 14px;margin-bottom:14px;border-radius:6px;background:var(--surface);border:1px solid var(--line);white-space:pre-wrap;line-height:1.6}
+.status.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.status.err{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.status.loading{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+.spin{display:inline-block;width:9px;height:9px;border:1.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s 0.7s linear infinite;vertical-align:-1px;margin-right:5px}
+@keyframes s{to{transform:rotate(360deg)}}
+
+.view-tabs{display:flex;gap:6px;margin-bottom:24px;border-bottom:1px solid var(--line)}
+.view-tab{font-family:'Inter',sans-serif;font-weight:500;font-size:13px;padding:10px 18px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--ink-3);cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:-1px}
+.view-tab:hover{color:var(--ink)}
+.view-tab.on{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+.view-tab .badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:1px 7px;border-radius:10px;background:var(--bg);color:var(--ink-3);font-weight:500;border:1px solid var(--line)}
+.view-tab.on .badge{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+.view{display:none}
+.view.show{display:block}
+
+.war-intro{font-size:13px;color:var(--ink-3);margin-bottom:20px;padding:10px 14px;background:var(--info-bg);border-left:3px solid var(--info);border-radius:0 6px 6px 0}
+
+/* TWIN NORTH STARS */
+.ns-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+@media (max-width:900px){.ns-row{grid-template-columns:1fr}}
+.north-star{background:var(--surface);border:2px solid var(--ink);border-radius:12px;padding:24px 28px;position:relative;overflow:hidden}
+.north-star.good{border-color:var(--good);background:linear-gradient(135deg,#fff 0%,var(--good-bg) 100%)}
+.north-star.warn{border-color:var(--warn);background:linear-gradient(135deg,#fff 0%,var(--warn-bg) 100%)}
+.north-star.bad{border-color:var(--bad);background:linear-gradient(135deg,#fff 0%,var(--bad-bg) 100%)}
+.ns-meta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.ns-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.ns-tag::before{content:'★ ';color:var(--warn)}
+.ns-status{font-family:'Inter',sans-serif;font-size:10px;font-weight:600;padding:3px 10px;border-radius:12px;letter-spacing:0.05em;text-transform:uppercase}
+.ns-status.good{background:var(--good);color:#fff}
+.ns-status.warn{background:var(--warn);color:#fff}
+.ns-status.bad{background:var(--bad);color:#fff}
+.ns-label{font-size:13px;color:var(--ink-2);margin-bottom:4px;font-weight:500}
+.ns-desc{font-size:10px;color:var(--ink-3);margin-bottom:14px;line-height:1.4;height:28px}
+.ns-value{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.ns-num{font-size:60px;font-weight:300;line-height:0.95;letter-spacing:-0.04em;font-feature-settings:'tnum'}
+.ns-num.good{color:var(--good-strong)}
+.ns-num.warn{color:var(--warn-strong)}
+.ns-num.bad{color:var(--bad-strong)}
+.ns-unit{font-size:22px;color:var(--ink-3);font-weight:300}
+.ns-target{font-size:12px;color:var(--ink-3);font-family:'JetBrains Mono',monospace;line-height:1.5}
+.ns-target b{color:var(--ink);font-weight:500}
+.ns-progress{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:14px;position:relative}
+.ns-progress-fill{height:100%;background:var(--ink);transition:width 0.6s ease}
+.ns-progress-fill.good{background:var(--good)}
+.ns-progress-fill.warn{background:var(--warn)}
+.ns-progress-fill.bad{background:var(--bad)}
+.ns-progress-target{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);opacity:0.4}
+
+.ns-target-input{display:inline-block;background:transparent;border:none;border-bottom:1px dashed var(--ink-3);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:var(--ink);padding:1px 4px;width:75px;outline:none;text-align:right}
+.ns-target-input:focus{border-bottom-color:var(--ink);background:var(--bg)}
+
+/* Combined health indicator */
+.health-bar{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 18px;margin-bottom:24px;font-size:12px}
+.health-bar.healthy{background:var(--good-bg);border-color:var(--good);color:var(--good-strong)}
+.health-bar.warn{background:var(--warn-bg);border-color:var(--warn);color:var(--warn-strong)}
+.health-bar.crisis{background:var(--bad-bg);border-color:var(--bad);color:var(--bad-strong)}
+.health-bar.fraud{background:var(--bad-bg);border-color:var(--bad);color:var(--bad-strong);border-width:2px}
+.health-bar strong{font-weight:600;font-size:13px;margin-right:8px}
+
+/* Drivers */
+.drivers-label{font-size:11px;font-weight:500;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
+.drivers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+@media (max-width:900px){.drivers{grid-template-columns:1fr}}
+.driver{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:20px 22px}
+.driver.good{border-color:var(--good);background:linear-gradient(135deg,#fff 0%,var(--good-bg) 100%)}
+.driver.warn{border-color:var(--warn);background:linear-gradient(135deg,#fff 0%,var(--warn-bg) 100%)}
+.driver.bad{border-color:var(--bad);background:linear-gradient(135deg,#fff 0%,var(--bad-bg) 100%)}
+.driver-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.driver-tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-3);letter-spacing:0.05em}
+.driver-light{width:10px;height:10px;border-radius:50%;background:var(--ink-4)}
+.driver-light.good{background:var(--good)}
+.driver-light.warn{background:var(--warn)}
+.driver-light.bad{background:var(--bad)}
+.driver-label{font-size:12px;color:var(--ink-2);margin-bottom:10px;font-weight:500;line-height:1.3}
+.driver-value{display:flex;align-items:baseline;gap:6px}
+.driver-num{font-size:38px;font-weight:400;line-height:1;letter-spacing:-0.02em;font-feature-settings:'tnum'}
+.driver-num.good{color:var(--good-strong)}
+.driver-num.warn{color:var(--warn-strong)}
+.driver-num.bad{color:var(--bad-strong)}
+.driver-unit{font-size:14px;color:var(--ink-3)}
+.driver-foot{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-3);margin-top:8px;line-height:1.4}
+
+.action-panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin-bottom:14px}
+.action-panel h3{font-size:13px;font-weight:600;margin-bottom:10px}
+.action-list{font-size:12px;color:var(--ink-2);line-height:1.7}
+.action-list li{padding:5px 0;list-style:none;display:flex;align-items:flex-start;gap:8px}
+.action-list .lt{font-size:11px;color:var(--ink-4);font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-top:2px}
+
+.section-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);margin-top:24px}
+.section-head:first-child{margin-top:0}
+.section-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-4);font-weight:500;background:var(--bg);padding:3px 8px;border-radius:3px;border:1px solid var(--line)}
+.section-title{font-size:15px;font-weight:500}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;position:relative}
+.kpi-status{position:absolute;top:10px;right:12px;font-family:'JetBrains Mono',monospace;font-size:9px;padding:1px 6px;border-radius:3px;letter-spacing:0.05em;font-weight:500}
+.kpi-status.ok{background:var(--good-bg);color:var(--good)}
+.kpi-status.todo{background:var(--warn-bg);color:var(--warn)}
+.kpi-status.no{background:var(--bad-bg);color:var(--bad)}
+.kpi-label{font-size:11px;color:var(--ink-3);margin-bottom:8px;padding-right:62px}
+.kpi-value{font-size:24px;font-weight:500;line-height:1.05;letter-spacing:-0.02em;font-feature-settings:'tnum'}
+.kpi-unit{font-size:13px;color:var(--ink-4);font-weight:400;margin-left:3px}
+.kpi-delta{font-family:'JetBrains Mono',monospace;font-size:11px;margin-top:6px}
+.kpi-delta.up{color:var(--good)}
+.kpi-delta.down{color:var(--bad)}
+.kpi-delta.flat{color:var(--ink-4)}
+.kpi-foot{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-4);margin-top:6px}
+.kpi.disabled{background:var(--bg);border-style:dashed}
+.kpi-empty{color:var(--ink-4);font-size:18px;font-weight:300}
+.kpi-reason{font-size:11px;color:var(--ink-3);margin-top:6px;line-height:1.4}
+
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:900px){.chart-row{grid-template-columns:1fr}}
+.chart-box{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.chart-box-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.chart-title{font-size:13px;font-weight:500}
+.chart-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-4)}
+.chart-canvas{position:relative;height:240px}
+
+.tbl{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:14px}
+.tbl-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.tbl-head h3{font-size:13px;font-weight:500}
+.tbl-head .meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-4)}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{font-size:10px;font-weight:500;color:var(--ink-3);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--bg);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
+thead th.num{text-align:right}
+tbody td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody td.num{text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px}
+tbody td.name{font-weight:450}
+tbody tr:hover td{background:var(--bg)}
+tbody tr:last-child td{border-bottom:none}
+.rank{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-4);font-weight:500}
+.rank.top{color:var(--good)}
+.rank.bot{color:var(--bad)}
+.bar{display:inline-block;height:5px;background:var(--ink);vertical-align:middle;margin-right:8px;border-radius:2px;opacity:0.85}
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 7px;border-radius:10px;border:1px solid var(--line-2);color:var(--ink-3);background:var(--bg)}
+.pill.good{border-color:var(--good);color:var(--good);background:var(--good-bg)}
+.pill.bad{border-color:var(--bad);color:var(--bad);background:var(--bad-bg)}
+.pill.warn{border-color:var(--warn);color:var(--warn);background:var(--warn-bg)}
+.id-cell{white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:10px}
+.id-text{color:var(--ink-3);background:var(--bg);padding:2px 6px;border-radius:3px;border:1px solid var(--line);margin-right:4px;letter-spacing:-0.02em}
+.id-btn{font-family:'Inter',sans-serif;font-size:10px;font-weight:500;padding:2px 7px;border:1px solid var(--line-2);border-radius:3px;background:var(--surface);color:var(--ink-3);cursor:pointer;margin-right:3px}
+.id-btn:hover{border-color:var(--ink-3);color:var(--ink)}
+.id-btn.copied{border-color:var(--good);color:var(--good);background:var(--good-bg)}
+
+.persp{margin-top:24px}
+.persp-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.persp-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-4);font-weight:500}
+.persp-title{font-size:15px;font-weight:500}
+.persp-meta{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.persp-pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;padding:1px 6px;border-radius:3px;background:var(--bg);color:var(--ink-3);margin-left:6px;letter-spacing:0.05em;border:1px solid var(--line)}
+
+.empty{padding:32px 16px;text-align:center;color:var(--ink-4);font-size:12px}
+.hidden{display:none !important}
+.legend{margin-top:32px;padding:16px 18px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--ink-3);line-height:1.7}
+.legend strong{color:var(--ink-2);font-weight:500}
+.legend code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg);padding:1px 5px;border-radius:3px;border:1px solid var(--line)}
+
+/* Source filter */
+.source-filter{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:14px}
+.sf-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.sf-title{font-size:13px;font-weight:500}
+.sf-meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3)}
+.sf-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:12px}
+.sf-group{padding:10px 12px;border-radius:6px;border:1px solid var(--line);background:var(--bg)}
+.sf-group.dvkh{border-color:var(--good);background:var(--good-bg)}
+.sf-group.marketplace{border-color:var(--warn);background:var(--warn-bg)}
+.sf-group.other{border-color:var(--line-2)}
+.sf-group-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase}
+.sf-group.dvkh .sf-group-head{color:var(--good-strong)}
+.sf-group.marketplace .sf-group-head{color:var(--warn-strong)}
+.sf-group-toggle{font-size:10px;font-family:'Inter',sans-serif;font-weight:500;padding:1px 7px;border:1px solid currentColor;border-radius:3px;background:transparent;cursor:pointer;text-transform:none;letter-spacing:0}
+.sf-source{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:12px;cursor:pointer;user-select:none}
+.sf-source input{margin:0;cursor:pointer}
+.sf-source-name{flex:1;color:var(--ink-2)}
+.sf-source-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-4)}
+.sf-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.sf-hint{font-size:11px;color:var(--ink-3);font-style:italic}
+
+/* Reason ranking */
+.reason-bar-row{display:flex;align-items:center;gap:10px;padding:6px 0}
+.reason-label{font-size:12px;flex:1;min-width:0}
+.reason-bar-track{flex:2;height:18px;background:var(--bg);border-radius:9px;overflow:hidden;position:relative}
+.reason-bar-fill{height:100%;background:var(--bad);transition:width 0.4s}
+.reason-count{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3);min-width:60px;text-align:right}
+
+/* Source filter */
+.src-group{border:1px solid var(--line);border-radius:6px;padding:10px 12px;background:var(--bg)}
+.src-group-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.src-group-name{font-size:12px;font-weight:500;color:var(--ink-2)}
+.src-group.dvkh{border-left:3px solid var(--good)}
+.src-group.market{border-left:3px solid var(--warn)}
+.src-group.other{border-left:3px solid var(--ink-4)}
+.src-group-link{font-size:10px;color:var(--info);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:inherit;padding:0}
+.src-group-link:hover{color:var(--ink)}
+.src-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;cursor:pointer;color:var(--ink-2)}
+.src-item:hover{color:var(--ink)}
+.src-item input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--ink)}
+.src-item-count{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-4);background:var(--surface);padding:1px 6px;border-radius:3px;border:1px solid var(--line)}
+.src-empty{padding:8px 0;font-size:11px;color:var(--ink-4);font-style:italic}
+
+/* Tooltip */
+.tooltip-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--ink-4);color:#fff;font-size:9px;font-weight:600;margin-left:4px;cursor:help;font-family:'Inter',sans-serif;vertical-align:1px}
+.tooltip-icon:hover{background:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="head">
+    <div class="head-l">
+      <h1>Phòng Dịch vụ khách hàng</h1>
+      <div class="sub">2 North Stars · 3 Drivers · 5 Supporting · Pull từ Pancake POS</div>
+    </div>
+    <div class="head-r">
+      <div><span class="k">Period</span> · <span id="meta-period">—</span></div>
+      <div><span class="k">Generated</span> · <span id="meta-now">—</span></div>
+      <div><span class="k">Source</span> · pos.pages.fm/api/v1</div>
+    </div>
+  </header>
+
+  <div class="cfg">
+    <div><label>API Key</label><input type="password" id="api_key" autocomplete="off" placeholder="paste key"></div>
+    <div><label>Shop ID</label><input type="text" id="shop_id" placeholder="vd 1942976467"></div>
+    <div><label>Từ ngày</label><input type="date" id="date_from"></div>
+    <div><label>Đến ngày</label><input type="date" id="date_to"></div>
+    <div><label>Agent IDs</label><input type="text" id="agent_ids" placeholder="optional"></div>
+    <div class="acts">
+      <button class="btn" id="btn-run" onclick="run()">Chạy</button>
+      <button class="btn ghost" onclick="loadDemo()">Demo</button>
+    </div>
+  </div>
+
+  <div id="source-filter" class="source-filter hidden">
+    <div class="sf-head">
+      <span class="sf-title">Lọc nguồn đơn — chỉ tính nguồn cần tư vấn DVKH</span>
+      <span class="sf-meta" id="sf-meta">—</span>
+    </div>
+    <div class="sf-groups" id="sf-groups"></div>
+    <div class="sf-actions">
+      <button class="btn ghost" onclick="reRunWithFilter()">Áp dụng filter & tính lại</button>
+      <span class="sf-hint">Mặc định tick các nguồn cần tư vấn. Bỏ tick các nguồn DVKH không chịu trách nhiệm.</span>
+    </div>
+  </div>
+
+  <div id="status" class="status hidden"></div>
+
+  <div id="dashboard" class="hidden">
+
+    <div class="view-tabs">
+      <button class="view-tab on" onclick="switchView(event,'war')">🎯 War Room <span class="badge">2+3</span></button>
+      <button class="view-tab" onclick="switchView(event,'ops')">⚙ Operations <span class="badge">5+</span></button>
+      <button class="view-tab" onclick="switchView(event,'bsc')">📊 BSC Scorecard <span class="badge">16</span></button>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- VIEW 1: WAR ROOM                             -->
+    <!-- ============================================ -->
+    <div id="view-war" class="view show">
+
+      <div class="war-intro">
+        <strong>Daily War Room</strong> — 2 North Star song song để phát hiện <em>Telesale chốt ảo</em> (doanh thu cao nhưng SDR thấp = chốt láo). Click qua Operations xem top lý do bùng đơn.
+      </div>
+
+      <!-- TWIN NORTH STARS -->
+      <div class="ns-row">
+        <!-- NS-1: REVENUE -->
+        <div id="north-star-1" class="north-star">
+          <div class="ns-meta">
+            <span class="ns-tag">NS-1 · Số lượng</span>
+            <span id="ns1-status-badge" class="ns-status">—</span>
+          </div>
+          <div class="ns-label">Doanh thu DVKH (đã chốt)</div>
+          <div class="ns-desc">SUM total_price các đơn confirmed. Đo số lượng Telesale chốt được.</div>
+          <div class="ns-value">
+            <span id="ns1-num" class="ns-num">—</span>
+            <span class="ns-unit">VND</span>
+          </div>
+          <div class="ns-target">
+            Target tháng <input type="text" id="ns1-target" class="ns-target-input" placeholder="600M" value="600M">
+            · <span id="ns1-detail">—</span>
+          </div>
+          <div class="ns-progress">
+            <div id="ns1-progress-fill" class="ns-progress-fill" style="width:0%"></div>
+            <div class="ns-progress-target" style="left:100%"></div>
+          </div>
+        </div>
+
+        <!-- NS-2: SDR -->
+        <div id="north-star-2" class="north-star">
+          <div class="ns-meta">
+            <span class="ns-tag">NS-2 · Chất lượng <span class="tooltip-icon" title="Cohort window: SDR đo trên đơn SHIP cách đây 7-21 ngày để có đủ buffer cho shipper giao xong. Khác kỳ với Doanh thu.">?</span></span>
+            <span id="ns2-status-badge" class="ns-status">—</span>
+          </div>
+          <div class="ns-label">Successful Delivery Rate (SDR)</div>
+          <div class="ns-desc">Đơn KH thực sự nhận / đơn đã giao shipper. <em>Cohort window 7-21d trước</em> để chờ shipper hoàn tất.</div>
+          <div class="ns-value">
+            <span id="ns2-num" class="ns-num">—</span>
+            <span class="ns-unit">%</span>
+          </div>
+          <div class="ns-target">
+            Target <input type="text" id="ns2-target" class="ns-target-input" placeholder="92" value="92">% · 
+            <span id="ns2-detail">—</span>
+          </div>
+          <div class="ns-progress">
+            <div id="ns2-progress-fill" class="ns-progress-fill" style="width:0%"></div>
+            <div class="ns-progress-target" style="left:92%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HEALTH BAR — kết hợp 2 NS để phát hiện chốt ảo -->
+      <div id="health-bar" class="health-bar">
+        <div><strong id="health-title">Đang phân tích...</strong><span id="health-detail"></span></div>
+      </div>
+
+      <!-- 3 DRIVERS -->
+      <div class="drivers-label">3 Key Drivers</div>
+      <div class="drivers">
+        <div id="driver-1" class="driver">
+          <div class="driver-head">
+            <span class="driver-tag">D1 · Telesale</span>
+            <span id="d1-light" class="driver-light"></span>
+          </div>
+          <div class="driver-label">Tỷ lệ chốt (status 0→1)</div>
+          <div class="driver-value">
+            <span id="d1-num" class="driver-num">—</span>
+            <span class="driver-unit">%</span>
+          </div>
+          <div class="driver-foot" id="d1-foot">đơn confirmed / đơn được tạo</div>
+        </div>
+
+        <div id="driver-2" class="driver">
+          <div class="driver-head">
+            <span class="driver-tag">D2 · Khiếu nại</span>
+            <span id="d2-light" class="driver-light"></span>
+          </div>
+          <div class="driver-label">Refund Rate</div>
+          <div class="driver-value">
+            <span id="d2-num" class="driver-num">—</span>
+            <span class="driver-unit">%</span>
+          </div>
+          <div class="driver-foot" id="d2-foot">đơn refund / total</div>
+        </div>
+
+        <div id="driver-3" class="driver">
+          <div class="driver-head">
+            <span class="driver-tag">D3 · Trưởng phòng</span>
+            <span id="d3-light" class="driver-light"></span>
+          </div>
+          <div class="driver-label">SLA Lead time ≤ 4h</div>
+          <div class="driver-value">
+            <span id="d3-num" class="driver-num">—</span>
+            <span class="driver-unit">%</span>
+          </div>
+          <div class="driver-foot" id="d3-foot">tốc độ phản hồi</div>
+        </div>
+      </div>
+
+      <div class="action-panel">
+        <h3>📋 Hành động đề xuất hôm nay</h3>
+        <ul class="action-list" id="action-list">
+          <li class="lt">— đang phân tích —</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- ============================================ -->
+    <!-- VIEW 2: OPERATIONS                           -->
+    <!-- ============================================ -->
+    <div id="view-ops" class="view">
+
+      <div class="war-intro">
+        <strong>Operations Detail</strong> — 5 supporting + Top lý do bùng đơn (NDR analysis) + drill-down. Đây là chỗ root cause khi War Room có dấu vàng/đỏ.
+      </div>
+
+      <div class="section-head">
+        <span class="section-num">5 SUPPORTING</span>
+        <span class="section-title">Chỉ số bổ trợ</span>
+      </div>
+      <div class="kpi-grid" id="grid-supporting"></div>
+
+      <div class="chart-row">
+        <div class="chart-box">
+          <div class="chart-box-head">
+            <span class="chart-title">Doanh thu & SDR theo ngày</span>
+            <span class="chart-sub">trend song song</span>
+          </div>
+          <div class="chart-canvas"><canvas id="chart-revenue"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-box-head">
+            <span class="chart-title">Refund & NDR theo ngày</span>
+            <span class="chart-sub">% / day</span>
+          </div>
+          <div class="chart-canvas"><canvas id="chart-rates"></canvas></div>
+        </div>
+      </div>
+
+      <!-- TOP NDR REASONS -->
+      <div class="tbl">
+        <div class="tbl-head">
+          <h3>Top lý do bùng đơn (NDR Analysis)</h3>
+          <span class="meta" id="ndr-count">—</span>
+        </div>
+        <div style="padding:14px 18px" id="ndr-bars">
+          <div class="empty">— đang phân tích —</div>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <div class="tbl-head">
+          <h3>Bảng xếp hạng theo agent</h3>
+          <span class="meta" id="agent-count">—</span>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr>
+              <th>#</th><th>Agent</th><th>ID</th>
+              <th class="num">Doanh thu</th>
+              <th class="num">Đơn chốt</th>
+              <th class="num">% chốt</th>
+              <th class="num">SDR</th>
+              <th class="num">Refund</th>
+              <th class="num">AOV</th>
+            </tr></thead>
+            <tbody id="agent-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <div class="tbl-head"><h3>Top 10 đơn refund</h3><span class="meta">theo giá trị</span></div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Mã</th><th>Agent</th><th>Lý do</th><th class="num">Giá trị</th></tr></thead>
+            <tbody id="refund-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================ -->
+    <!-- VIEW 3: BSC                                  -->
+    <!-- ============================================ -->
+    <div id="view-bsc" class="view">
+
+      <div class="war-intro">
+        <strong>BSC Scorecard</strong> — đầy đủ 16 KPI BSC theo 4 phương diện. Dùng cho báo cáo BOD/COO hàng tháng.
+      </div>
+
+      <div class="persp">
+        <div class="persp-head">
+          <span class="persp-num">I</span>
+          <span class="persp-title">Tài chính</span>
+          <span class="persp-meta">5 KPI · <span class="persp-pill">5 ok</span></span>
+        </div>
+        <div class="kpi-grid" id="grid-fin"></div>
+      </div>
+
+      <div class="persp">
+        <div class="persp-head">
+          <span class="persp-num">II</span>
+          <span class="persp-title">Khách hàng</span>
+          <span class="persp-meta">3 KPI · <span class="persp-pill">3 ok</span></span>
+        </div>
+        <div class="kpi-grid" id="grid-cus"></div>
+      </div>
+
+      <div class="persp">
+        <div class="persp-head">
+          <span class="persp-num">III</span>
+          <span class="persp-title">Quy trình</span>
+          <span class="persp-meta">5 KPI · <span class="persp-pill">3 ok</span> <span class="persp-pill">2 todo</span></span>
+        </div>
+        <div class="kpi-grid" id="grid-prc"></div>
+      </div>
+
+      <div class="persp">
+        <div class="persp-head">
+          <span class="persp-num">IV</span>
+          <span class="persp-title">Học hỏi & Phát triển</span>
+          <span class="persp-meta">3 KPI · <span class="persp-pill">1 ok</span> <span class="persp-pill">2 no</span></span>
+        </div>
+        <div class="kpi-grid" id="grid-lrn"></div>
+      </div>
+
+    </div>
+
+    <div class="legend">
+      <div><strong>2 North Stars song song:</strong> NS-1 = Doanh thu (số lượng), NS-2 = SDR (chất lượng). Nếu NS-1 cao + NS-2 thấp → cảnh báo Telesale chốt ảo.</div>
+      <div><strong>SDR (Successful Delivery Rate) — cohort:</strong> đo trên đơn ship cách đây 7-21 ngày. Numerator = đơn delivered (status 3). Denominator = delivered + returned (status 5,6). Đơn còn shipping (status 2) bị loại để tránh deflated metric.</div>
+      <div><strong>NDR Analysis:</strong> phân loại đơn không nhận theo lý do. 80% NDR là do chất lượng chốt của Telesale.</div>
+      <div><strong>Status code Pancake:</strong> 0=mới · 1=xác nhận · 2=shipping · 3=delivered · 4=hủy · 5=returned · 6=returning</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_BASE='https://pos.pages.fm/api/v1';
+const SLA_LEAD_TIME_MIN=240;
+
+// SDR window: tính trên 14 ngày để đảm bảo data có lag shipping
+const SDR_WINDOW_DAYS=14;
+
+// SDR cohort: đo đơn ship cách đây 7-21 ngày
+const SDR_BUFFER_DAYS=7;
+const SDR_LOOKBACK_DAYS=21;
+
+// Source classification — keyword matching
+const SOURCE_KEYWORDS={
+  dvkh:['pancake','inbox','messenger','chat','comment','fb','facebook','zalo','call','hotline','telesale','phone','livestream','live','manual','custom'],
+  marketplace:['shopee','lazada','tiktok','sendo','tiki','marketplace','amazon','ebay','walmart','shop ee','laz']
+};
+// 'other' = phần còn lại (POS, wholesale, affiliate, web, ...)
+
+function classifySource(name){
+  const n=String(name||'').toLowerCase();
+  if(!n)return 'other';
+  for(const k of SOURCE_KEYWORDS.dvkh)if(n.includes(k))return 'dvkh';
+  for(const k of SOURCE_KEYWORDS.marketplace)if(n.includes(k))return 'marketplace';
+  return 'other';
+}
+
+const TARGETS={
+  ns2_sdr:92,
+  d1_close:{green:60,red:40},
+  d2_refund:{green:3,red:7},
+  d3_sla:{green:90,red:75}
+};
+
+const KPI_DEFS={
+  supporting:[
+    {id:'sup_aov',label:'AOV',unit:'VND'},
+    {id:'sup_upsell',label:'Upsell Rate',unit:'%'},
+    {id:'sup_repeat',label:'Repeat Rate 90 ngày',unit:'%'},
+    {id:'sup_pending',label:'Đơn pending > 24h',unit:'đơn',invertColor:true},
+    {id:'sup_active_agents',label:'Agent active',unit:'người'}
+  ],
+  fin:[
+    {id:'fin_revenue_chot',label:'Doanh thu đã chốt',unit:'VND',status:'ok'},
+    {id:'fin_revenue_thuc',label:'Doanh thu thực (delivered)',unit:'VND',status:'ok'},
+    {id:'fin_aov',label:'AOV',unit:'VND',status:'ok'},
+    {id:'fin_refund',label:'Refund Rate',unit:'%',status:'ok',invertColor:true},
+    {id:'fin_redeliv',label:'Re-delivery Rate',unit:'%',status:'ok',invertColor:true}
+  ],
+  cus:[
+    {id:'cus_repeat',label:'Repeat Rate 90 ngày',unit:'%',status:'ok'},
+    {id:'cus_clv',label:'Customer Lifetime Value',unit:'VND',status:'ok'},
+    {id:'cus_total',label:'Tổng khách hàng',unit:'người',status:'ok'}
+  ],
+  prc:[
+    {id:'prc_close',label:'Tỷ lệ chốt',unit:'%',status:'ok'},
+    {id:'prc_sdr',label:'Successful Delivery Rate',unit:'%',status:'ok'},
+    {id:'prc_sla',label:'SLA ≤ 4h',unit:'%',status:'ok'},
+    {id:'prc_frt',label:'First Response Time',unit:'phút',status:'todo',reason:'Cần Pancake Chat API'},
+    {id:'prc_aht',label:'Avg Handle Time',unit:'phút',status:'todo',reason:'Cần Pancake Chat API'}
+  ],
+  lrn:[
+    {id:'lrn_distribution',label:'Round-robin đồng đều',unit:'σ',status:'ok'},
+    {id:'lrn_csat',label:'CSAT',unit:'%',status:'no',reason:'Cần survey post-chat'},
+    {id:'lrn_training',label:'Training hours / agent',unit:'giờ',status:'no',reason:'Cần HRM ngoài'}
+  ]
+};
+
+let state={charts:{},rawCurr:null,rawPrev:null,rawCohort:null,userMap:{},allOrdersCurr:[],allOrdersPrev:[],allOrdersCohort:[],sourceMap:{},enabledSources:new Set()};
+
+const fmt={
+  num:n=>Math.round(n).toLocaleString('vi-VN'),
+  vnd:n=>Math.round(n).toLocaleString('vi-VN'),
+  vndShort:n=>{
+    if(n>=1e9)return(n/1e9).toFixed(2)+'B';
+    if(n>=1e6)return(n/1e6).toFixed(0)+'M';
+    if(n>=1e3)return(n/1e3).toFixed(0)+'K';
+    return Math.round(n).toString();
+  },
+  date:d=>d.toISOString().slice(0,10),
+  dateVN:d=>d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'}),
+  mins:m=>{
+    if(m<60)return Math.round(m)+'m';
+    const h=Math.floor(m/60),mm=Math.round(m%60);
+    return h+'h '+(mm>0?mm+'m':'');
+  }
+};
+
+function parseTarget(s){
+  if(!s)return 0;
+  s=String(s).trim().toUpperCase().replace(/[, ]/g,'');
+  if(s.endsWith('B'))return parseFloat(s.slice(0,-1))*1e9;
+  if(s.endsWith('M'))return parseFloat(s.slice(0,-1))*1e6;
+  if(s.endsWith('K'))return parseFloat(s.slice(0,-1))*1e3;
+  return parseFloat(s)||0;
+}
+
+function setStatus(msg,type='loading'){
+  const el=document.getElementById('status');
+  el.className='status '+type;
+  el.classList.remove('hidden');
+  if(type==='loading')el.innerHTML='<span class="spin"></span>'+msg;
+  else el.textContent=msg;
+}
+function hideStatus(){document.getElementById('status').classList.add('hidden')}
+function toEpochSec(d){return Math.floor(d.getTime()/1000)}
+
+function switchView(e,id){
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('on'));
+  e.currentTarget.classList.add('on');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('show'));
+  document.getElementById('view-'+id).classList.add('show');
+}
+
+async function fetchOrdersPage(apiKey,shopId,startDate,endDate,page){
+  const url=API_BASE+'/shops/'+shopId+'/orders?api_key='+encodeURIComponent(apiKey)+
+    '&startDateTime='+toEpochSec(startDate)+'&endDateTime='+toEpochSec(endDate)+
+    '&page_number='+page+'&page_size=100';
+  const res=await fetch(url);
+  if(!res.ok)throw new Error('API error '+res.status);
+  return await res.json();
+}
+
+async function fetchAllOrders(apiKey,shopId,startDate,endDate){
+  let all=[],page=1,total=null;
+  while(true){
+    setStatus('Pull trang '+page+(total!==null?' / '+Math.ceil(total/100):'')+'...');
+    const data=await fetchOrdersPage(apiKey,shopId,startDate,endDate,page);
+    if(!data.success&&data.success!==undefined)throw new Error('API success=false');
+    const orders=data.data||data.orders||[];
+    if(page===1&&(!data.total_entries||data.total_entries===0))return [];
+    if(orders.length===0)break;
+    all=all.concat(orders);
+    if(data.total_entries)total=data.total_entries;
+    if(orders.length<100)break;
+    page++;
+    if(page>100)break;
+  }
+  return all;
+}
+
+// Trích source từ order — Pancake POS có thể có order_sources_name hoặc source_id
+function getOrderSource(o){
+  // Thử các field khả dĩ
+  if(o.order_sources_name)return String(o.order_sources_name);
+  if(o.order_source_name)return String(o.order_source_name);
+  if(o.source_name)return String(o.source_name);
+  if(o.order_sources)return 'source_'+String(o.order_sources);
+  if(o.source_id!==undefined&&o.source_id!==null)return 'source_'+String(o.source_id);
+  if(o.source!==undefined&&o.source!==null){
+    if(typeof o.source==='object')return o.source.name||('source_'+(o.source.id||''));
+    return 'source_'+String(o.source);
+  }
+  return '(không xác định)';
+}
+
+function buildSourceMap(orders){
+  const map={}; // sourceName -> {count, group}
+  for(const o of orders){
+    const src=getOrderSource(o);
+    if(!map[src])map[src]={name:src,count:0,group:classifySource(src)};
+    map[src].count++;
+  }
+  return map;
+}
+
+function renderSourceFilter(sourceMap,enabled){
+  const groups={dvkh:[],marketplace:[],other:[]};
+  for(const src in sourceMap)groups[sourceMap[src].group].push(sourceMap[src]);
+  for(const g in groups)groups[g].sort((a,b)=>b.count-a.count);
+
+  const totalSources=Object.keys(sourceMap).length;
+  const enabledCount=enabled.size;
+  document.getElementById('sf-meta').textContent=enabledCount+'/'+totalSources+' nguồn được tick';
+
+  const groupLabels={
+    dvkh:{title:'📞 Cần tư vấn DVKH',color:'dvkh'},
+    marketplace:{title:'🛒 Sàn TMĐT',color:'marketplace'},
+    other:{title:'🏪 Khác / Chưa phân loại',color:'other'}
+  };
+
+  const html=Object.keys(groupLabels).map(g=>{
+    const items=groups[g];
+    if(items.length===0)return '';
+    const cfg=groupLabels[g];
+    const allEnabled=items.every(it=>enabled.has(it.name));
+    const toggleLabel=allEnabled?'Bỏ tick tất cả':'Tick tất cả';
+    return '<div class="sf-group '+cfg.color+'">'+
+      '<div class="sf-group-head">'+
+        '<span>'+cfg.title+' ('+items.length+')</span>'+
+        '<button class="sf-group-toggle" onclick="toggleGroup(\''+g+'\')">'+toggleLabel+'</button>'+
+      '</div>'+
+      items.map(it=>
+        '<label class="sf-source">'+
+          '<input type="checkbox" '+(enabled.has(it.name)?'checked':'')+' onchange="toggleSource(\''+it.name.replace(/'/g,"\\'")+'\')">'+
+          '<span class="sf-source-name">'+it.name+'</span>'+
+          '<span class="sf-source-count">'+it.count+' đơn</span>'+
+        '</label>'
+      ).join('')+
+    '</div>';
+  }).join('');
+
+  document.getElementById('sf-groups').innerHTML=html;
+  document.getElementById('source-filter').classList.remove('hidden');
+}
+
+function toggleSource(name){
+  if(state.enabledSources.has(name))state.enabledSources.delete(name);
+  else state.enabledSources.add(name);
+  renderSourceFilter(state.sourceMap,state.enabledSources);
+}
+
+function toggleGroup(group){
+  const allInGroup=Object.values(state.sourceMap).filter(s=>s.group===group);
+  const allEnabled=allInGroup.every(s=>state.enabledSources.has(s.name));
+  if(allEnabled){
+    allInGroup.forEach(s=>state.enabledSources.delete(s.name));
+  }else{
+    allInGroup.forEach(s=>state.enabledSources.add(s.name));
+  }
+  renderSourceFilter(state.sourceMap,state.enabledSources);
+}
+
+function filterOrdersBySource(orders,enabledSet){
+  if(!enabledSet||enabledSet.size===0)return orders;
+  return orders.filter(o=>enabledSet.has(getOrderSource(o)));
+}
+
+async function reRunWithFilter(){
+  if(!state.allOrdersCurr.length){setStatus('Chưa có data — bấm Chạy trước','err');return}
+  setStatus('Đang lọc và tính lại...');
+  const filteredCurr=filterOrdersBySource(state.allOrdersCurr,state.enabledSources);
+  const filteredPrev=filterOrdersBySource(state.allOrdersPrev,state.enabledSources);
+  const filteredCohort=filterOrdersBySource(state.allOrdersCohort,state.enabledSources);
+  recalcAndRender(filteredCurr,filteredPrev,filteredCohort);
+  setStatus('✓ Đã lọc theo '+state.enabledSources.size+' nguồn · '+filteredCurr.length+' đơn','ok');
+  setTimeout(hideStatus,3000);
+}
+
+function buildUserMapFromOrders(orders){
+  const map={};
+  const tryAdd=(id,name)=>{if(id&&name&&!map[id])map[id]=name};
+  for(const o of orders){
+    if(o.creator)tryAdd(o.creator.id,o.creator.name||o.creator.full_name);
+    if(o.assigning_seller)tryAdd(o.assigning_seller.id,o.assigning_seller.name||o.assigning_seller.full_name);
+    tryAdd(o.creator_id,o.creator_name);
+    tryAdd(o.assigning_seller_id,o.assigning_seller_name);
+    if(Array.isArray(o.status_history)){
+      for(const h of o.status_history){
+        if(h.editor)tryAdd(h.editor.id,h.editor.name||h.editor.full_name);
+        tryAdd(h.editor_id,h.name);
+      }
+    }
+  }
+  return map;
+}
+
+function getStatusFirstReached(o,statuses){
+  if(!Array.isArray(o.status_history))return null;
+  for(const h of o.status_history){
+    if(statuses.includes(h.status))return new Date(h.updated_at);
+  }
+  return null;
+}
+function hasReachedStatus(o,statuses){
+  if(!Array.isArray(o.status_history))return false;
+  return o.status_history.some(h=>statuses.includes(h.status));
+}
+function getStatusTransition(o,toStatus){
+  if(!Array.isArray(o.status_history))return null;
+  for(const h of o.status_history){
+    if(h.status===toStatus)return {at:new Date(h.updated_at)};
+  }
+  return null;
+}
+
+// Phân loại lý do bùng đơn — dựa vào canceled_reason / return_reason / status
+function classifyNDRReason(o){
+  const text=(o.canceled_reason||o.cancel_reason||o.return_reason||'').toLowerCase();
+  if(!text)return 'Khác / không ghi rõ';
+  if(text.includes('hỏng')||text.includes('vỡ')||text.includes('hư'))return 'Hàng hỏng / vỡ';
+  if(text.includes('sai địa chỉ')||text.includes('sai địa')||text.includes('không đúng địa'))return 'Sai địa chỉ';
+  if(text.includes('không nghe máy')||text.includes('không liên lạc')||text.includes('không nhấc'))return 'KH không nghe máy';
+  if(text.includes('không có nhà')||text.includes('vắng nhà'))return 'KH không có nhà';
+  if(text.includes('đổi ý')||text.includes('không lấy')||text.includes('không nhận')||text.includes('thôi'))return 'KH đổi ý';
+  if(text.includes('hết hàng')||text.includes('oos'))return 'Hết hàng';
+  if(text.includes('giá')||text.includes('phí'))return 'Vấn đề giá / phí';
+  if(text.includes('đặt nhầm')||text.includes('đặt sai'))return 'KH đặt nhầm';
+  if(text.includes('shipper')||text.includes('giao hàng'))return 'Vấn đề shipper';
+  return 'Khác: '+(o.canceled_reason||o.return_reason||'').slice(0,30);
+}
+
+function calculateAll(orders,userFilter){
+  let filtered=orders;
+  if(userFilter&&userFilter.length>0){
+    const set=new Set(userFilter);
+    filtered=orders.filter(o=>set.has(o.assigning_seller_id)||set.has(o.creator_id));
+  }
+
+  let revenueChot=0,revenueThuc=0;
+  let totalCreated=0,totalConfirmed=0,refundCount=0,shippedCount=0,deliveredCount=0,reDeliveryCount=0,upsellCount=0;
+  let totalForAOV=0,aovOrderCount=0;
+  let pending24h=0;
+  let leadTimeOK=0,leadTimeTotal=0;
+  let confirmedTotal=0;
+
+  const customers=new Set(),customerOrderMap={};
+  const daily={};
+  const agents={};
+  const refundList=[];
+  const ndrReasons={}; // { reason: {count, value} }
+
+  filtered.forEach(o=>{
+    const tp=parseFloat(o.total_price||o.total_price_after_sub_discount||0);
+    const dateKey=(o.inserted_at||'').slice(0,10);
+    const agentId=o.assigning_seller_id||o.creator_id||'unassigned';
+    const custId=o.customer_id||(o.customer&&o.customer.id);
+
+    const insertedAt=new Date(o.inserted_at);
+    const status=o.status;
+
+    if(!daily[dateKey])daily[dateKey]={revenueChot:0,revenueThuc:0,orders:0,refund:0,delivered:0,shipped:0};
+    if(!agents[agentId])agents[agentId]={
+      id:agentId,revenue:0,orders:0,refund:0,
+      created:0,confirmed:0,
+      upsell:0
+    };
+
+    totalCreated++;
+    agents[agentId].created++;
+
+    // Hasreachedstatus: đơn đã từng đi qua status đó
+    const reachedConfirmed=hasReachedStatus(o,[1,2,3,4,5,6]); // confirmed once
+    const reachedShipped=hasReachedStatus(o,[2,3,5,6]); // shipped once
+    const reachedDelivered=hasReachedStatus(o,[3]); // delivered
+
+    if(reachedConfirmed){
+      revenueChot+=tp;
+      totalConfirmed++;
+      confirmedTotal++;
+      agents[agentId].confirmed++;
+      daily[dateKey].revenueChot+=tp;
+      daily[dateKey].orders++;
+      agents[agentId].revenue+=tp;
+      agents[agentId].orders++;
+      totalForAOV+=tp;aovOrderCount++;
+      const items=o.items||[];
+      const distinctProducts=new Set(items.map(i=>i.product_id||i.variation_id));
+      if(distinctProducts.size>=2){upsellCount++;agents[agentId].upsell++}
+      if(custId){customers.add(custId);customerOrderMap[custId]=(customerOrderMap[custId]||0)+1}
+    }
+
+    if(reachedDelivered){
+      revenueThuc+=tp;
+      deliveredCount++;
+      daily[dateKey].revenueThuc+=tp;
+      daily[dateKey].delivered++;
+    }
+
+    if(reachedShipped){
+      shippedCount++;
+      daily[dateKey].shipped++;
+    }
+
+    // Re-delivery
+    if((o.num_send_partner||0)>1)reDeliveryCount++;
+
+    // Refund (status 5 hoặc 6)
+    if([5,6].includes(status)){
+      refundCount++;
+      daily[dateKey].refund++;
+      agents[agentId].refund++;
+      const reason=classifyNDRReason(o);
+      if(!ndrReasons[reason])ndrReasons[reason]={count:0,value:0};
+      ndrReasons[reason].count++;
+      ndrReasons[reason].value+=tp;
+      refundList.push({
+        id:o.system_id||o.id,
+        agent:agentId,
+        value:tp,
+        date:dateKey,
+        reason:o.canceled_reason||o.return_reason||'(không có)'
+      });
+    }
+
+    // Cancel (status 4)
+    if(status===4){
+      const reason=classifyNDRReason(o);
+      if(!ndrReasons[reason])ndrReasons[reason]={count:0,value:0};
+      ndrReasons[reason].count++;
+      ndrReasons[reason].value+=tp;
+    }
+
+    // SLA
+    const tConfirmed=getStatusTransition(o,1);
+    const tShipping=getStatusFirstReached(o,[2,3,5,6]);
+    if(tConfirmed&&tShipping){
+      const mins=(tShipping-tConfirmed.at)/60000;
+      if(mins>=0&&mins<7*24*60){
+        leadTimeTotal++;
+        if(mins<=SLA_LEAD_TIME_MIN)leadTimeOK++;
+      }
+    }
+
+    // Pending > 24h
+    const now=Date.now();
+    if((status===0||status===1||status===12)&&insertedAt&&(now-insertedAt.getTime())>86400000)pending24h++;
+  });
+
+  const repeatCustomers=Object.values(customerOrderMap).filter(v=>v>=2).length;
+  const totalCustomers=customers.size;
+  const activeAgents=Object.values(agents).filter(a=>a.orders>0).length;
+  const agentVolumes=Object.values(agents).filter(a=>a.orders>0).map(a=>a.orders);
+  const meanVol=agentVolumes.length?agentVolumes.reduce((a,b)=>a+b,0)/agentVolumes.length:0;
+  const variance=agentVolumes.length?agentVolumes.reduce((a,b)=>a+Math.pow(b-meanVol,2),0)/agentVolumes.length:0;
+  const stddev=Math.sqrt(variance);
+
+  // Sort NDR reasons
+  const ndrSorted=Object.entries(ndrReasons).sort((a,b)=>b[1].count-a[1].count);
+
+  return {
+    revenueChot,revenueThuc,
+    drivers:{
+      d1_close:totalCreated>0?(totalConfirmed/totalCreated)*100:0,
+      d2_refund:totalConfirmed>0?(refundCount/(totalConfirmed+refundCount))*100:0,
+      d3_sla:leadTimeTotal>0?(leadTimeOK/leadTimeTotal)*100:0
+    },
+    aov:aovOrderCount>0?totalForAOV/aovOrderCount:0,
+    upsellRate:totalConfirmed>0?(upsellCount/totalConfirmed)*100:0,
+    repeatRate:totalCustomers>0?(repeatCustomers/totalCustomers)*100:0,
+    pending24h,
+    activeAgents,
+    orderCount:totalConfirmed,
+    totalCreated,
+    refundCount,
+    shippedCount,
+    deliveredCount,
+    reDeliveryCount,
+    upsellCount,
+    refundRate:totalConfirmed>0?(refundCount/(totalConfirmed+refundCount))*100:0,
+    redelivRate:shippedCount>0?(reDeliveryCount/shippedCount)*100:0,
+    clv:totalCustomers>0?revenueChot/totalCustomers:0,
+    totalCustomers,
+    distribution:stddev,
+    daily,agents,
+    refundList:refundList.sort((a,b)=>b.value-a.value).slice(0,10),
+    ndrReasons:ndrSorted
+  };
+}
+
+// Tính SDR cohort: đơn ship trong khoảng [today-21d, today-7d]
+// Buffer 7 ngày để shipper có thời gian giao xong
+// Result không phụ thuộc date range anh chọn cho doanh thu
+function calculateSDRCohort(orders,userFilter){
+  let filtered=orders;
+  if(userFilter&&userFilter.length>0){
+    const set=new Set(userFilter);
+    filtered=orders.filter(o=>set.has(o.assigning_seller_id)||set.has(o.creator_id));
+  }
+
+  const cohortEnd=new Date(Date.now()-SDR_BUFFER_DAYS*86400000);
+  const cohortStart=new Date(Date.now()-SDR_LOOKBACK_DAYS*86400000);
+
+  let cohortShipped=0, cohortDelivered=0, cohortReturned=0;
+  const agentCohort={};
+
+  for(const o of filtered){
+    // Lấy timestamp lần đầu đi đến status shipping (2)
+    const tShipped=getStatusFirstReached(o,[2,3,5,6]);
+    if(!tShipped)continue;
+    if(tShipped<cohortStart||tShipped>cohortEnd)continue;
+
+    const agentId=o.assigning_seller_id||o.creator_id||'unassigned';
+    if(!agentCohort[agentId])agentCohort[agentId]={shipped:0,delivered:0,returned:0};
+
+    cohortShipped++;
+    agentCohort[agentId].shipped++;
+
+    const reachedDelivered=hasReachedStatus(o,[3]);
+    const reachedReturn=hasReachedStatus(o,[5,6]);
+
+    // Đếm theo terminal status: ưu tiên returned (status 5/6) trước
+    if(reachedReturn){
+      cohortReturned++;
+      agentCohort[agentId].returned++;
+    } else if(reachedDelivered){
+      cohortDelivered++;
+      agentCohort[agentId].delivered++;
+    }
+    // Else: đơn đã ship cách đây >7d nhưng vẫn đang shipping → đếm là chưa kết quả
+  }
+
+  const cohortTerminal=cohortDelivered+cohortReturned;
+  const sdr=cohortTerminal>0?(cohortDelivered/cohortTerminal)*100:0;
+
+  return {
+    sdr,
+    cohortShipped,
+    cohortDelivered,
+    cohortReturned,
+    cohortTerminal,
+    cohortStart,
+    cohortEnd,
+    agentCohort
+  };
+}
+
+function getStatusColor(value,target,red,inverted){
+  if(inverted){
+    if(value<=target)return 'good';
+    if(value>=red)return 'bad';
+    return 'warn';
+  }else{
+    if(value>=target)return 'good';
+    if(value<=red)return 'bad';
+    return 'warn';
+  }
+}
+
+function setNS(num,color,numStr,detail,pct){
+  const box=document.getElementById('north-star-'+num);
+  box.classList.remove('good','warn','bad');box.classList.add(color);
+  const numEl=document.getElementById('ns'+num+'-num');
+  numEl.classList.remove('good','warn','bad');numEl.classList.add(color);
+  numEl.textContent=numStr;
+  document.getElementById('ns'+num+'-detail').textContent=detail;
+  const badge=document.getElementById('ns'+num+'-status-badge');
+  badge.classList.remove('good','warn','bad');badge.classList.add(color);
+  badge.textContent=color==='good'?'TỐT':(color==='warn'?'CẢNH BÁO':'NGUY CƠ');
+  const fill=document.getElementById('ns'+num+'-progress-fill');
+  fill.classList.remove('good','warn','bad');fill.classList.add(color);
+  fill.style.width=Math.min(100,pct)+'%';
+}
+
+function setDriver(num,color,numStr,unit,foot){
+  const box=document.getElementById('driver-'+num);
+  box.classList.remove('good','warn','bad');box.classList.add(color);
+  const numEl=document.getElementById('d'+num+'-num');
+  numEl.classList.remove('good','warn','bad');numEl.classList.add(color);
+  numEl.textContent=numStr;
+  const light=document.getElementById('d'+num+'-light');
+  light.classList.remove('good','warn','bad');light.classList.add(color);
+  document.getElementById('d'+num+'-foot').textContent=foot;
+}
+
+function renderWarRoom(curr,cohortData){
+  // NS-1: Doanh thu
+  const target1=parseTarget(document.getElementById('ns1-target').value);
+  const pct1=target1>0?(curr.revenueChot/target1)*100:0;
+  let ns1Color='warn';
+  if(pct1>=100)ns1Color='good';
+  else if(pct1<70)ns1Color='bad';
+  setNS('1',ns1Color,fmt.vndShort(curr.revenueChot),
+    target1>0?(pct1.toFixed(1)+'% target · '+curr.orderCount+' đơn'):(curr.orderCount+' đơn confirmed'),pct1);
+
+  // NS-2: SDR cohort
+  const target2=parseFloat(document.getElementById('ns2-target').value)||92;
+  const sdr=cohortData?cohortData.sdr:0;
+  let ns2Color='warn';
+  if(cohortData&&cohortData.cohortTerminal>0){
+    if(sdr>=target2)ns2Color='good';
+    else if(sdr<target2-10)ns2Color='bad';
+  }
+  const cohortLabel=cohortData?
+    (fmt.dateVN(cohortData.cohortStart)+'→'+fmt.dateVN(cohortData.cohortEnd)+' · '+cohortData.cohortDelivered+' nhận / '+cohortData.cohortTerminal+' kết thúc')
+    :'chưa có data';
+  setNS('2',ns2Color,cohortData&&cohortData.cohortTerminal>0?sdr.toFixed(1)+'%':'—',cohortLabel,sdr);
+
+  // Health bar
+  const hb=document.getElementById('health-bar');
+  hb.classList.remove('healthy','warn','crisis','fraud');
+  let healthTitle='', healthDetail='';
+  if(!cohortData||cohortData.cohortTerminal===0){
+    hb.classList.add('warn');
+    healthTitle='△ Chưa đủ data SDR.';
+    healthDetail=' Cần đơn ship cách đây 7-21 ngày để tính. Có thể do range pull data hiện tại quá ngắn.';
+  } else if(ns1Color==='good'&&ns2Color==='good'){
+    hb.classList.add('healthy');
+    healthTitle='✓ Phòng vận hành tốt.';
+    healthDetail=' Doanh thu đạt target, chất lượng giao hàng cao. Duy trì.';
+  } else if(ns1Color==='good'&&ns2Color==='bad'){
+    hb.classList.add('fraud');
+    healthTitle='⚠ NGHI VẤN: Telesale chốt ảo.';
+    healthDetail=' Doanh thu hiện tại cao nhưng SDR cohort 14d trước thấp ('+sdr.toFixed(1)+'%) → khách bùng đơn nhiều. Audit chất lượng chốt agent có doanh thu cao.';
+  } else if(ns1Color==='bad'&&ns2Color==='good'){
+    hb.classList.add('warn');
+    healthTitle='△ Chốt ít nhưng chất lượng tốt.';
+    healthDetail=' Telesale có thể đang quá kén — push tăng volume nhưng không hy sinh chất lượng.';
+  } else if(ns1Color==='bad'&&ns2Color==='bad'){
+    hb.classList.add('crisis');
+    healthTitle='✗ KHỦNG HOẢNG.';
+    healthDetail=' Cả số lượng và chất lượng đều dưới chuẩn. Họp gấp với 3 trưởng nhóm + COO.';
+  } else {
+    hb.classList.add('warn');
+    healthTitle='△ Cần chú ý.';
+    healthDetail=' Một trong hai NS đang ở vùng cảnh báo — mở Operations Detail để soi.';
+  }
+  document.getElementById('health-title').textContent=healthTitle;
+  document.getElementById('health-detail').textContent=healthDetail;
+
+  // 3 Drivers
+  const d1=curr.drivers.d1_close;
+  const d1Color=getStatusColor(d1,TARGETS.d1_close.green,TARGETS.d1_close.red,false);
+  setDriver('1',d1Color,d1.toFixed(1),'%',
+    curr.orderCount+'/'+curr.totalCreated+' đơn · target ≥ '+TARGETS.d1_close.green+'%');
+
+  const d2=curr.drivers.d2_refund;
+  const d2Color=getStatusColor(d2,TARGETS.d2_refund.green,TARGETS.d2_refund.red,true);
+  setDriver('2',d2Color,d2.toFixed(1),'%',
+    curr.refundCount+' đơn refund · target ≤ '+TARGETS.d2_refund.green+'%');
+
+  const d3=curr.drivers.d3_sla;
+  const d3Color=getStatusColor(d3,TARGETS.d3_sla.green,TARGETS.d3_sla.red,false);
+  setDriver('3',d3Color,d3.toFixed(1),'%','target ≥ '+TARGETS.d3_sla.green+'%');
+
+  renderActions(curr,cohortData,ns1Color,ns2Color,d1Color,d2Color,d3Color);
+}
+
+function renderActions(curr,cohortData,ns1,ns2,d1,d2,d3){
+  const actions=[];
+  const sdr=cohortData?cohortData.sdr:0;
+
+  if(ns1==='good'&&ns2==='bad'){
+    actions.push({t:'NGAY',msg:'Doanh thu đạt nhưng SDR cohort 14d trước ('+sdr.toFixed(1)+'%) báo động — kiểm tra Top NDR Reasons để biết khách bùng vì lý do gì.'});
+    actions.push({t:'Tuần này',msg:'Audit 5 agent có doanh thu cao nhất xem SDR cá nhân — nếu thấp thì là dấu hiệu chốt ẩu.'});
+  }
+  if(ns1==='bad'&&ns2==='good'){
+    actions.push({t:'Tuần này',msg:'Doanh thu chưa đạt. Push Telesale tăng volume — chất lượng đang tốt, có dư địa.'});
+  }
+  if(ns1==='bad'&&ns2==='bad'){
+    actions.push({t:'NGAY',msg:'Cả số lượng và chất lượng đều dưới chuẩn. Họp gấp 3 trưởng nhóm + COO.'});
+  }
+  if(d1==='bad'){
+    actions.push({t:'NGAY',msg:'Tỷ lệ chốt thấp ('+curr.drivers.d1_close.toFixed(1)+'%). Review script Telesale + nghe lại 10 cuộc gần nhất.'});
+  }
+  if(d2==='bad'){
+    actions.push({t:'NGAY',msg:'Refund Rate cao ('+curr.drivers.d2_refund.toFixed(1)+'%). Pull top 10 đơn refund + root cause analysis.'});
+  }
+  if(d3==='bad'){
+    actions.push({t:'NGAY',msg:'SLA tệ ('+curr.drivers.d3_sla.toFixed(1)+'%). Có thể quá tải — check số agent active vs volume.'});
+  }
+  if(curr.pending24h>=5){
+    actions.push({t:'NGAY',msg:'Có '+curr.pending24h+' đơn pending > 24h. Telesale follow-up gấp.'});
+  }
+
+  if(actions.length===0){
+    if(ns1==='good'&&ns2==='good'){
+      actions.push({t:'',msg:'Toàn bộ chỉ số xanh — phòng vận hành xuất sắc. Tìm cơ hội nâng tầm: optimize AOV, push upsell.'});
+    }else{
+      actions.push({t:'',msg:'Chỉ số ổn nhưng chưa hoàn hảo. Mở Operations Detail để soi chi tiết.'});
+    }
+  }
+
+  document.getElementById('action-list').innerHTML=actions.map(a=>
+    '<li>'+(a.t?'<span class="lt">['+a.t+']</span>':'<span class="lt">·</span>')+'<span>'+a.msg+'</span></li>'
+  ).join('');
+}
+
+function renderKPI(def,val,prevVal,foot,status='ok'){
+  if(status!=='ok'){
+    const badge=status==='todo'?'TODO':'NO';
+    const reasonLabel=status==='todo'?'Cần xử lý:':'Không có:';
+    const reasonColor=status==='todo'?'var(--warn)':'var(--bad)';
+    return '<div class="kpi disabled"><span class="kpi-status '+status+'">'+badge+'</span>'+
+      '<div class="kpi-label">'+def.label+'</div>'+
+      '<div class="kpi-empty">— <span style="font-size:13px">'+def.unit+'</span></div>'+
+      '<div class="kpi-reason"><strong style="color:'+reasonColor+'">'+reasonLabel+'</strong> '+(def.reason||'')+'</div></div>';
+  }
+  const fmtFn=def.unit==='VND'?fmt.vndShort:
+    (def.unit==='%'?(x=>x.toFixed(1)):
+    (def.unit==='phút'?(x=>fmt.mins(x)):
+    (['σ','pts'].includes(def.unit)?(x=>x.toFixed(2)):fmt.num)));
+  let deltaHtml='— vs kỳ trước',deltaCls='flat';
+  if(prevVal!==null&&prevVal!==undefined&&prevVal>0&&val!==null&&!isNaN(val)){
+    const d=(val-prevVal)/prevVal;
+    const isUp=d>0;
+    const sign=isUp?'↑':(d<0?'↓':'→');
+    const cls=def.invertColor?(isUp?'down':'up'):(isUp?'up':'down');
+    deltaHtml=sign+' '+(Math.abs(d)*100).toFixed(1)+'% vs kỳ trước';
+    deltaCls=Math.abs(d)<0.001?'flat':cls;
+  }
+  return '<div class="kpi"><span class="kpi-status ok">OK</span>'+
+    '<div class="kpi-label">'+def.label+'</div>'+
+    '<div class="kpi-value">'+(val!==null&&!isNaN(val)?fmtFn(val):'—')+'<span class="kpi-unit">'+def.unit+'</span></div>'+
+    '<div class="kpi-delta '+deltaCls+'">'+deltaHtml+'</div>'+
+    '<div class="kpi-foot">'+(foot||'')+'</div></div>';
+}
+
+function renderOpsView(curr,prev){
+  const html=[];
+  html.push(renderKPI(KPI_DEFS.supporting[0],curr.aov,prev?.aov,'doanh thu / đơn'));
+  html.push(renderKPI(KPI_DEFS.supporting[1],curr.upsellRate,prev?.upsellRate,curr.upsellCount+' đơn ≥2 SP'));
+  html.push(renderKPI(KPI_DEFS.supporting[2],curr.repeatRate,prev?.repeatRate,'khách quay lại'));
+  html.push(renderKPI(KPI_DEFS.supporting[3],curr.pending24h,prev?.pending24h,'đơn quá 24h'));
+  html.push(renderKPI(KPI_DEFS.supporting[4],curr.activeAgents,prev?.activeAgents,'agent có đơn'));
+  document.getElementById('grid-supporting').innerHTML=html.join('');
+
+  // NDR analysis
+  const ndrEl=document.getElementById('ndr-bars');
+  if(curr.ndrReasons.length===0){
+    ndrEl.innerHTML='<div class="empty">Không có đơn refund/cancel để phân tích ✓</div>';
+    document.getElementById('ndr-count').textContent='—';
+  }else{
+    const total=curr.ndrReasons.reduce((s,[,v])=>s+v.count,0);
+    const totalValue=curr.ndrReasons.reduce((s,[,v])=>s+v.value,0);
+    const max=curr.ndrReasons[0][1].count;
+    document.getElementById('ndr-count').textContent=total+' đơn · '+fmt.vndShort(totalValue);
+    ndrEl.innerHTML=curr.ndrReasons.slice(0,8).map(([reason,v])=>{
+      const pct=(v.count/total*100).toFixed(1);
+      const w=(v.count/max*100);
+      return '<div class="reason-bar-row">'+
+        '<div class="reason-label">'+reason+'</div>'+
+        '<div class="reason-bar-track"><div class="reason-bar-fill" style="width:'+w+'%"></div></div>'+
+        '<div class="reason-count">'+v.count+' đơn · '+pct+'%</div>'+
+      '</div>';
+    }).join('');
+  }
+}
+
+function renderBSCView(curr,prev,cohortData){
+  const sdr=cohortData?cohortData.sdr:0;
+  const valueMap={
+    fin_revenue_chot:curr.revenueChot, fin_revenue_thuc:curr.revenueThuc,
+    fin_aov:curr.aov, fin_refund:curr.refundRate, fin_redeliv:curr.redelivRate,
+    cus_repeat:curr.repeatRate, cus_clv:curr.clv, cus_total:curr.totalCustomers,
+    prc_close:curr.drivers.d1_close, prc_sdr:sdr, prc_sla:curr.drivers.d3_sla,
+    lrn_distribution:curr.distribution
+  };
+  const prevMap=prev?{
+    fin_revenue_chot:prev.revenueChot, fin_revenue_thuc:prev.revenueThuc,
+    fin_aov:prev.aov, fin_refund:prev.refundRate, fin_redeliv:prev.redelivRate,
+    cus_repeat:prev.repeatRate, cus_clv:prev.clv, cus_total:prev.totalCustomers,
+    prc_close:prev.drivers.d1_close, prc_sdr:0, prc_sla:prev.drivers.d3_sla,
+    lrn_distribution:prev.distribution
+  }:{};
+
+  for(const persp of ['fin','cus','prc','lrn']){
+    const html=KPI_DEFS[persp].map(def=>{
+      if(def.status&&def.status!=='ok')return renderKPI(def,null,null,null,def.status);
+      const val=valueMap[def.id];
+      const prevVal=prevMap[def.id];
+      let foot='';
+      if(def.id==='fin_revenue_chot')foot=curr.orderCount+' đơn confirmed';
+      else if(def.id==='fin_revenue_thuc')foot=curr.deliveredCount+' đơn delivered';
+      else if(def.id==='cus_total')foot='khách có đơn';
+      else if(def.id==='prc_sla')foot='confirm → ship ≤ 4h';
+      else if(def.id==='prc_sdr')foot=cohortData?'cohort '+SDR_BUFFER_DAYS+'-'+SDR_LOOKBACK_DAYS+'d trước':'chưa có';
+      else if(def.id==='prc_close')foot='confirmed / created';
+      else if(def.id==='lrn_distribution')foot='thấp = đồng đều';
+      return renderKPI(def,val,prevVal,foot,'ok');
+    });
+    document.getElementById('grid-'+persp).innerHTML=html.join('');
+  }
+}
+
+function renderCharts(curr){
+  const dates=Object.keys(curr.daily).sort();
+  const labels=dates.map(d=>fmt.dateVN(new Date(d)));
+  Object.values(state.charts).forEach(c=>c.destroy());
+  state.charts={};
+  const baseOpts={
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{font:{family:"'Inter'",size:10},color:'#737373',boxWidth:8,boxHeight:8,padding:12},position:'bottom'}},
+    scales:{
+      x:{grid:{color:'#e8e5dc'},ticks:{font:{family:"'JetBrains Mono'",size:10},color:'#737373'}},
+      y:{grid:{color:'#e8e5dc'},ticks:{font:{family:"'JetBrains Mono'",size:10},color:'#737373'}}
+    }
+  };
+  state.charts.revenue=new Chart(document.getElementById('chart-revenue'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Doanh thu chốt',data:dates.map(d=>curr.daily[d].revenueChot),backgroundColor:'#a8a39a',yAxisID:'y',borderRadius:2},
+      {label:'Doanh thu thực',data:dates.map(d=>curr.daily[d].revenueThuc),backgroundColor:'#1a1a1a',yAxisID:'y',borderRadius:2}
+    ]},
+    options:{...baseOpts,scales:{
+      ...baseOpts.scales,
+      y:{...baseOpts.scales.y,ticks:{...baseOpts.scales.y.ticks,callback:v=>fmt.vndShort(v)}}
+    }}
+  });
+  const refundRates=dates.map(d=>{const dd=curr.daily[d];const denom=dd.orders+dd.refund;return denom>0?(dd.refund/denom*100):0});
+  const ndrRates=dates.map(d=>{const dd=curr.daily[d];return dd.shipped>0?(1-dd.delivered/dd.shipped)*100:0});
+  state.charts.rates=new Chart(document.getElementById('chart-rates'),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Refund %',data:refundRates,borderColor:'#9a2a2a',backgroundColor:'rgba(154,42,42,0.08)',tension:0.3,fill:true,pointRadius:3},
+      {label:'NDR % (1 - SDR)',data:ndrRates,borderColor:'#8a5a0a',backgroundColor:'rgba(138,90,10,0.08)',tension:0.3,fill:true,pointRadius:3}
+    ]},
+    options:{...baseOpts,scales:{
+      ...baseOpts.scales,
+      y:{...baseOpts.scales.y,ticks:{...baseOpts.scales.y.ticks,callback:v=>v.toFixed(1)+'%'}}
+    }}
+  });
+}
+
+function renderAgentTable(curr,userMap,cohortData){
+  const list=Object.values(curr.agents).filter(a=>a.orders>0||a.refund>0).sort((a,b)=>b.revenue-a.revenue);
+  document.getElementById('agent-count').textContent=list.length+' agent active';
+  if(list.length===0){
+    document.getElementById('agent-tbody').innerHTML='<tr><td colspan="9" class="empty">Không có data</td></tr>';
+    return;
+  }
+  const maxRev=Math.max(...list.map(a=>a.revenue),1);
+  const agentCohort=cohortData?cohortData.agentCohort:{};
+  document.getElementById('agent-tbody').innerHTML=list.map((a,i)=>{
+    const aov=a.orders>0?a.revenue/a.orders:0;
+    const closeR=a.created>0?a.confirmed/a.created*100:0;
+    const ac=agentCohort[a.id];
+    const sdrTerminal=ac?(ac.delivered+ac.returned):0;
+    const sdrR=sdrTerminal>0?(ac.delivered/sdrTerminal*100):0;
+    const refundR=(a.orders+a.refund)>0?a.refund/(a.orders+a.refund)*100:0;
+    const barW=a.revenue/maxRev*50;
+    const rankClass=i<3?'top':(i>=list.length-3?'bot':'');
+    const name=userMap[a.id]||(a.id==='unassigned'?'Chưa phân công':'(chưa map)');
+    const idCell=a.id==='unassigned'?'<span style="color:var(--ink-4)">—</span>':
+      '<span class="id-text" title="'+a.id+'">'+String(a.id).slice(-12)+'</span>'+
+      '<button class="id-btn" onclick="copyId(\''+a.id+'\',this)">copy</button>'+
+      '<button class="id-btn" onclick="addToFilter(\''+a.id+'\',this)">+ filter</button>';
+    return '<tr>'+
+      '<td><span class="rank '+rankClass+'">'+(i+1)+'</span></td>'+
+      '<td class="name">'+name+'</td>'+
+      '<td class="id-cell">'+idCell+'</td>'+
+      '<td class="num"><span class="bar" style="width:'+barW+'px"></span>'+fmt.vndShort(a.revenue)+'</td>'+
+      '<td class="num">'+a.orders+'</td>'+
+      '<td class="num">'+closeR.toFixed(1)+'%</td>'+
+      '<td class="num"><span class="pill '+(sdrR>=92?'good':sdrR>=80?'warn':sdrR>0?'bad':'')+'">'+(sdrTerminal>0?sdrR.toFixed(1)+'%':'—')+'</span></td>'+
+      '<td class="num"><span class="pill '+(refundR>5?'bad':refundR>3?'warn':'good')+'">'+refundR.toFixed(1)+'%</span></td>'+
+      '<td class="num">'+fmt.vndShort(aov)+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function renderRefundTable(curr,userMap){
+  const tbody=document.getElementById('refund-tbody');
+  if(curr.refundList.length===0){
+    tbody.innerHTML='<tr><td colspan="4" class="empty">Không có đơn refund ✓</td></tr>';
+    return;
+  }
+  tbody.innerHTML=curr.refundList.map(r=>{
+    const name=userMap[r.agent]||(r.agent==='unassigned'?'Chưa phân công':'(chưa map)');
+    const reasonShort=r.reason.length>40?r.reason.slice(0,40)+'...':r.reason;
+    return '<tr>'+
+      '<td class="name">#'+r.id+'</td>'+
+      '<td>'+name+'</td>'+
+      '<td title="'+r.reason+'">'+reasonShort+'</td>'+
+      '<td class="num">'+fmt.vnd(r.value)+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+async function run(){
+  const apiKey=document.getElementById('api_key').value.trim();
+  const shopId=document.getElementById('shop_id').value.trim();
+  const dateFrom=document.getElementById('date_from').value;
+  const dateTo=document.getElementById('date_to').value;
+  const agentIdsRaw=document.getElementById('agent_ids').value.trim();
+  const userFilter=agentIdsRaw?agentIdsRaw.split(',').map(s=>s.trim()).filter(Boolean):[];
+
+  if(!apiKey||!shopId){setStatus('Cần API Key và Shop ID','err');return}
+  if(!dateFrom||!dateTo){setStatus('Cần chọn từ ngày và đến ngày','err');return}
+  const startCurr=new Date(dateFrom+'T00:00:00');
+  const endCurr=new Date(dateTo+'T23:59:59');
+  const days=Math.ceil((endCurr-startCurr)/86400000);
+  const startPrev=new Date(startCurr.getTime()-days*86400000);
+  const endPrev=new Date(startCurr.getTime()-1000);
+
+  // Cohort window cho SDR: pull đơn tạo trong khoảng [today-LOOKBACK-30d, today-BUFFER]
+  // Buffer rộng 30d để chắc chắn bắt được đơn ship trong cohort window
+  const cohortPullStart=new Date(Date.now()-(SDR_LOOKBACK_DAYS+30)*86400000);
+  const cohortPullEnd=new Date(Date.now()-SDR_BUFFER_DAYS*86400000);
+
+  const btn=document.getElementById('btn-run');
+  btn.disabled=true;
+  try{
+    setStatus('Pull đơn kỳ hiện tại ('+days+'d)...');
+    const currOrders=await fetchAllOrders(apiKey,shopId,startCurr,endCurr);
+    if(currOrders.length===0){setStatus('API trả 0 đơn.','err');return}
+    setStatus('Pull đơn kỳ trước...');
+    const prevOrders=await fetchAllOrders(apiKey,shopId,startPrev,endPrev);
+
+    // Pull cohort orders riêng để tính SDR
+    setStatus('Pull cohort SDR ('+fmt.date(cohortPullStart)+' → '+fmt.date(cohortPullEnd)+')...');
+    const cohortOrders=await fetchAllOrders(apiKey,shopId,cohortPullStart,cohortPullEnd);
+
+    // Save raw orders để re-filter theo source mà không phải pull lại
+    state.allOrdersCurr=currOrders;
+    state.allOrdersPrev=prevOrders;
+    state.allOrdersCohort=cohortOrders;
+
+    // Build source map từ ALL data (curr + prev + cohort)
+    const allOrders=[...currOrders,...prevOrders,...cohortOrders];
+    state.sourceMap=buildSourceMap(allOrders);
+
+    // Mặc định tick các source thuộc nhóm 'dvkh'
+    state.enabledSources=new Set(
+      Object.values(state.sourceMap).filter(s=>s.group==='dvkh').map(s=>s.name)
+    );
+    // Nếu không có source nào nhóm 'dvkh' (auto-classify miss), tick tất cả ngoài marketplace
+    if(state.enabledSources.size===0){
+      state.enabledSources=new Set(
+        Object.values(state.sourceMap).filter(s=>s.group!=='marketplace').map(s=>s.name)
+      );
+    }
+
+    // Render source filter UI
+    renderSourceFilter(state.sourceMap,state.enabledSources);
+
+    // Filter rồi tính
+    const filteredCurr=filterOrdersBySource(currOrders,state.enabledSources);
+    const filteredPrev=filterOrdersBySource(prevOrders,state.enabledSources);
+    const filteredCohort=filterOrdersBySource(cohortOrders,state.enabledSources);
+
+    state.userFilter=userFilter;
+    recalcAndRender(filteredCurr,filteredPrev,filteredCohort);
+
+    document.getElementById('meta-period').textContent=fmt.date(startCurr)+' → '+fmt.date(endCurr)+' ('+days+'d)';
+    document.getElementById('meta-now').textContent=new Date().toLocaleString('vi-VN');
+
+    document.getElementById('dashboard').classList.remove('hidden');
+    setStatus('✓ '+currOrders.length+' đơn kỳ này · '+cohortOrders.length+' đơn cohort · '+state.enabledSources.size+'/'+Object.keys(state.sourceMap).length+' nguồn được tick','ok');
+    setTimeout(hideStatus,3000);
+  }catch(e){setStatus('Lỗi: '+e.message,'err');console.error(e)}
+  finally{btn.disabled=false}
+}
+
+function recalcAndRender(currOrders,prevOrders,cohortOrders){
+  const userFilter=state.userFilter||[];
+  const curr=calculateAll(currOrders,userFilter);
+  const prev=calculateAll(prevOrders,userFilter);
+  const cohortData=calculateSDRCohort(cohortOrders,userFilter);
+  const userMap=buildUserMapFromOrders([...currOrders,...prevOrders,...cohortOrders]);
+  state.rawCurr=curr;state.rawPrev=prev;state.rawCohort=cohortData;state.userMap=userMap;
+
+  renderWarRoom(curr,cohortData);
+  renderOpsView(curr,prev);
+  renderBSCView(curr,prev,cohortData);
+  renderCharts(curr);
+  renderAgentTable(curr,userMap,cohortData);
+  renderRefundTable(curr,userMap);
+}
+
+function copyId(id,btn){
+  navigator.clipboard.writeText(id).then(()=>{
+    const orig=btn.textContent;btn.textContent='✓';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied')},1500);
+  });
+}
+function addToFilter(id,btn){
+  const input=document.getElementById('agent_ids');
+  const current=input.value.trim();
+  const ids=current?current.split(',').map(s=>s.trim()).filter(Boolean):[];
+  if(ids.includes(id)){btn.textContent='đã có';setTimeout(()=>{btn.textContent='+ filter'},1500);return}
+  ids.push(id);input.value=ids.join(', ');
+  const orig=btn.textContent;btn.textContent='✓';btn.classList.add('copied');
+  setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied')},1500);
+}
+
+function loadDemo(){
+  const now=new Date();
+  document.getElementById('meta-period').textContent='Demo · 7 ngày';
+  document.getElementById('meta-now').textContent=now.toLocaleString('vi-VN');
+
+  const mockCurr=generateMockOrders(now,7,400);
+  const mockPrev=generateMockOrders(new Date(now.getTime()-7*86400000),7,360);
+  // Cohort: tạo orders có shipped trong khoảng cohort
+  const mockCohort=generateMockOrders(new Date(now.getTime()-SDR_BUFFER_DAYS*86400000),SDR_LOOKBACK_DAYS-SDR_BUFFER_DAYS,500);
+
+  state.allOrdersCurr=mockCurr;
+  state.allOrdersPrev=mockPrev;
+  state.allOrdersCohort=mockCohort;
+
+  state.sourceMap=buildSourceMap([...mockCurr,...mockPrev,...mockCohort]);
+  state.enabledSources=new Set(
+    Object.values(state.sourceMap).filter(s=>s.group==='dvkh').map(s=>s.name)
+  );
+  if(state.enabledSources.size===0){
+    state.enabledSources=new Set(Object.keys(state.sourceMap));
+  }
+  renderSourceFilter(state.sourceMap,state.enabledSources);
+
+  state.userFilter=[];
+  const filteredCurr=filterOrdersBySource(mockCurr,state.enabledSources);
+  const filteredPrev=filterOrdersBySource(mockPrev,state.enabledSources);
+  const filteredCohort=filterOrdersBySource(mockCohort,state.enabledSources);
+  recalcAndRender(filteredCurr,filteredPrev,filteredCohort);
+
+  // Override userMap với mock names
+  const userMap={agent_a:'Lan Phương',agent_b:'Tuấn Anh',agent_c:'Mai Linh',agent_d:'Hoàng Nam',agent_e:'Bích Ngọc'};
+  state.userMap=userMap;
+  renderAgentTable(state.rawCurr,userMap,state.rawCohort);
+  renderRefundTable(state.rawCurr,userMap);
+
+  document.getElementById('dashboard').classList.remove('hidden');
+  setStatus('Demo · '+mockCurr.length+' đơn kỳ này · '+mockCohort.length+' đơn cohort · '+state.enabledSources.size+'/'+Object.keys(state.sourceMap).length+' nguồn','ok');
+  setTimeout(hideStatus,3000);
+}
+
+function generateMockOrders(endDate,days,count){
+  const orders=[];
+  const agents=['agent_a','agent_b','agent_c','agent_d','agent_e'];
+  const cancelReasons=['Khách không nghe máy','Khách đổi ý không lấy','Hàng vỡ trong quá trình giao','Sai địa chỉ giao hàng','Khách không có nhà','Khách đặt nhầm sản phẩm','Hết hàng OOS','Vấn đề shipper'];
+  // Mock các source khác nhau với phân bổ thực tế
+  const sources=[
+    'Pancake Inbox','Pancake Inbox','Pancake Inbox','FB Comment','FB Comment',
+    'Hotline','Telesale Outbound',
+    'Shopee','Shopee','Lazada','TikTok Shop',
+    'Web Landing Page','POS Offline'
+  ];
+  for(let i=0;i<count;i++){
+    const dayOffset=Math.floor(Math.random()*days);
+    const d=new Date(endDate.getTime()-dayOffset*86400000);
+    const r=Math.random();
+    let status, num_send_partner=0, canceled_reason='';
+    if(r<0.05){status=0}
+    else if(r<0.15){status=4; canceled_reason=cancelReasons[Math.floor(Math.random()*cancelReasons.length)]}
+    else if(r<0.30){status=1}
+    else if(r<0.65){status=3; num_send_partner=1}
+    else if(r<0.78){status=2; num_send_partner=1}
+    else {status=5; num_send_partner=Math.random()<0.3?2:1; canceled_reason=cancelReasons[Math.floor(Math.random()*cancelReasons.length)]}
+
+    const itemCount=Math.random()<0.35?2+Math.floor(Math.random()*3):1;
+    const items=[];
+    for(let j=0;j<itemCount;j++){
+      items.push({product_id:'prod_'+Math.floor(Math.random()*30),quantity:1+Math.floor(Math.random()*2)});
+    }
+    const tp=Math.floor(150000+Math.random()*1500000);
+    const agentId=agents[Math.floor(Math.random()*agents.length)];
+    const sourceName=sources[Math.floor(Math.random()*sources.length)];
+    const history=[
+      {status:0,updated_at:d.toISOString(),editor_id:agentId,name:'Agent'}
+    ];
+    if(status>=1&&status!==0){
+      history.push({status:1,updated_at:new Date(d.getTime()+5*60000).toISOString(),editor_id:agentId,name:'Agent'});
+    }
+    if([2,3,5,6].includes(status)){
+      const t2=new Date(d.getTime()+(60+Math.random()*240)*60000);
+      history.push({status:2,updated_at:t2.toISOString()});
+    }
+    if(status===3){
+      const t3=new Date(d.getTime()+(2+Math.random()*5)*86400000);
+      history.push({status:3,updated_at:t3.toISOString()});
+    }
+    if(status===4){
+      const t4=new Date(d.getTime()+(30+Math.random()*180)*60000);
+      history.push({status:4,updated_at:t4.toISOString()});
+    }
+    if(status===5){
+      const t5=new Date(d.getTime()+(3+Math.random()*4)*86400000);
+      history.push({status:5,updated_at:t5.toISOString()});
+    }
+    orders.push({
+      system_id:1000000+i,id:'o_'+i,total_price:tp,status,
+      inserted_at:d.toISOString(),
+      assigning_seller_id:agentId,
+      customer_id:'cust_'+Math.floor(Math.random()*180),
+      num_send_partner,
+      canceled_reason,
+      order_sources_name:sourceName,
+      items,
+      status_history:history
+    });
+  }
+  return orders;
+}
+
+(function initDates(){
+  const today=new Date();
+  const sevenAgo=new Date(today.getTime()-7*86400000);
+  document.getElementById('date_to').value=fmt.date(today);
+  document.getElementById('date_from').value=fmt.date(sevenAgo);
+})();
+
+document.getElementById('ns1-target').addEventListener('input',()=>{if(state.rawCurr)renderWarRoom(state.rawCurr,state.rawCohort)});
+document.getElementById('ns2-target').addEventListener('input',()=>{if(state.rawCurr)renderWarRoom(state.rawCurr,state.rawCohort)});
+</script>
+</body>
+</html>
